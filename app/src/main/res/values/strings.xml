@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FileParser</string>
+    <string name="hint.file.path">Путь к файлу</string>
+    <string name="hint.regexp">Регулярное выражение</string>
+    <string name="button.stop">Стоп</string>
+    <string name="button_start">Старт</string>
+</resources>
