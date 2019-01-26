@@ -1,6 +1,8 @@
 package com.rrinat.fileparser;
 
 import android.Manifest;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -55,6 +60,22 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
 
     private void setupListeners() {
         startButton.setOnClickListener(v -> onStartClick());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        new MenuInflater(this).inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.copy) {
+            onCopyClick();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -164,6 +185,15 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
             hideStartButton();
         } else {
             showStartButton();
+        }
+    }
+
+    private void onCopyClick() {
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        if (clipboard != null) {
+            String value = adapter.getSelectedItems();
+            ClipData clip = ClipData.newPlainText(getString(R.string.clip_copy), value);
+            clipboard.setPrimaryClip(clip);
         }
     }
 }

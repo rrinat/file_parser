@@ -5,4 +5,6 @@
     <string name="button_start">Старт</string>
 
     <string name="error_parsing">Ошибка при парсинге</string>
+    <string name="meny_copy">Копировать</string>
+    <string name="clip_copy">Copy text</string>
 </resources>
