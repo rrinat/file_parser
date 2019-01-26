@@ -16,8 +16,8 @@
             android:id="@+id/file_path_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint.file.path"
-            android:text="/storage/emulated/0/Download/small.txt"
+            android:hint="@string/hint_file_path"
+            android:text="/storage/emulated/0/Download/big.txt"
             android:inputType="textUri"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -31,7 +31,7 @@
             android:id="@+id/rexexp_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/hint.regexp"
+            android:hint="@string/hint_regexp"
             android:inputType="text"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -40,15 +40,8 @@
         android:text="@string/button_start"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_medium"
-        android:layout_width="match_parent"/>
-
-    <Button
-        android:id="@+id/stop_button"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_medium"
-        android:layout_width="match_parent"
         android:visibility="gone"
-        android:text="@string/button.stop"/>
+        android:layout_width="match_parent"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"

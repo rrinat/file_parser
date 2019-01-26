@@ -28,7 +28,6 @@ public class FileParser {
     private BufferedWriter writer = null;
     private File inputFile;
     private File outputFile = null;
-    private boolean isParsing = false;
 
     public FileParser(final Listener listener, final String inputFilePath, final Pattern pattern) {
         this.listener = listener;
@@ -36,30 +35,35 @@ public class FileParser {
         this.pattern = pattern;
     }
 
-    public void start() {
-        if (isParsing) {
-            return;
+    public boolean start() {
+        if (checkFiles()) {
+            parsing();
+            return true;
+        } else {
+            return false;
         }
+    }
 
+    private boolean checkFiles() {
         inputFile = createInputFile();
         if (inputFile == null) {
             listener.onError();
-            return;
+            return false;
         }
 
         outputFile = createOutputFile();
         if (outputFile == null) {
             listener.onError();
-            return;
+            return false;
         }
 
         initReaderAndWriter();
         if (reader == null || writer == null) {
             listener.onError();
-            return;
+            return false;
         }
 
-        parsing();
+        return true;
     }
 
     private File createInputFile() {
@@ -90,8 +94,6 @@ public class FileParser {
     }
 
     private void parsing() {
-        isParsing = true;
-
         new Thread(createParsingRunnable()).start();
     }
 
@@ -110,13 +112,11 @@ public class FileParser {
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeReaderAndWriter();
-                        isParsing = false;
                         listener.onError();
                         return;
                     }
 
                 }
-                isParsing = false;
                 closeReader();
                 if (closeWriter()) {
                     listener.onComplete();

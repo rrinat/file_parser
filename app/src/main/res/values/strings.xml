@@ -1,9 +1,8 @@
 <resources>
     <string name="app_name">FileParser</string>
-    <string name="hint.file.path">Путь к файлу</string>
-    <string name="hint.regexp">Регулярное выражение</string>
-    <string name="button.stop">Стоп</string>
+    <string name="hint_file_path">Путь к файлу</string>
+    <string name="hint_regexp">Регулярное выражение</string>
     <string name="button_start">Старт</string>
 
-    <string name="error.parsing">Ошибка при парсинге</string>
+    <string name="error_parsing">Ошибка при парсинге</string>
 </resources>

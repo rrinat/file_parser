@@ -7,12 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
-    private final List<String> items = new ArrayList<>();
+    private List<String> items = Collections.emptyList();
 
     @NonNull
     @Override
@@ -31,14 +31,19 @@ class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         return items.size();
     }
 
-    void add(String value) {
+    void onAdd() {
         int position = getItemCount();
-        items.add(value);
-        notifyItemChanged(position);
+        if (position > 0) {
+            notifyItemChanged(position - 1);
+        }
     }
 
-    void clear() {
-        items.clear();
+    void onClearLines() {
+        notifyDataSetChanged();
+    }
+
+    void setItems(List<String> items) {
+        this.items = items;
         notifyDataSetChanged();
     }
 
