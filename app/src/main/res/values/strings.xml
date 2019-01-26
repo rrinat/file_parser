@@ -4,4 +4,6 @@
     <string name="hint.regexp">Регулярное выражение</string>
     <string name="button.stop">Стоп</string>
     <string name="button_start">Старт</string>
+
+    <string name="error.parsing">Ошибка при парсинге</string>
 </resources>

@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint.file.path"
+            android:text="/storage/emulated/0/Download/small.txt"
             android:inputType="textUri"/>
     </android.support.design.widget.TextInputLayout>
 
@@ -34,28 +35,20 @@
             android:inputType="text"/>
     </android.support.design.widget.TextInputLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/start_button"
+        android:text="@string/button_start"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_medium">
+        android:layout_margin="@dimen/margin_medium"
+        android:layout_width="match_parent"/>
 
-        <Button
-            android:id="@+id/start_button"
-            android:text="@string/button_start"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="@dimen/margin_small"
-            android:layout_width="0dp"/>
-
-        <Button
-            android:id="@+id/stop_button"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_marginStart="@dimen/margin_small"
-            android:text="@string/button.stop"/>
-    </LinearLayout>
+    <Button
+        android:id="@+id/stop_button"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_medium"
+        android:layout_width="match_parent"
+        android:visibility="gone"
+        android:text="@string/button.stop"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
