@@ -1,8 +1,8 @@
 package com.rrinat.fileparser;
 
+
 import org.junit.Test;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
@@ -47,5 +47,19 @@ public class ExampleUnitTest {
         assertEquals(converter.convertPattern("abcb?asds").pattern(), "^abcb.{1}asds$");
         assertEquals(converter.convertPattern("abc**ddfd?").pattern(), "^abc.*ddfd.{1}$");
         assertEquals(converter.convertPattern("a?abc").pattern(), "^a.{1}abc$");
+    }
+
+    @Test
+    public void normalize() {
+        RegExpConverter converter = new RegExpConverter();
+
+        assertEquals(converter.normalize(""), "$");
+        assertEquals(converter.normalize("*"), "*");
+        assertEquals(converter.normalize("**"), "*");
+        assertEquals(converter.normalize("?"), "?$");
+        assertEquals(converter.normalize("*Some*"), "*Some*");
+        assertEquals(converter.normalize("*Some"), "*Some$");
+        assertEquals(converter.normalize("?Some**"), "?Some*");
+        assertEquals(converter.normalize("***So?me"), "*So?me$");
     }
 }

@@ -10,6 +10,18 @@ public class RegExpConverter {
     private static final String JAVA_REG_EXP_ANY_SYMBOLS = ".*";
     private static final String JAVA_REG_EXP_ONE_ANE_SYMBOL = ".{1}";
 
+    public String normalize(final String regexp) {
+        final String anySymbols = "" + Consts.REG_EXPR_SYMBOLS_ANY;
+
+        String pattern = regexp.replaceAll("\\*{2,}", anySymbols);
+
+        if (!regexp.endsWith(anySymbols)) {
+            pattern += Consts.REG_EXPR_SYMBOL_LINE_END;
+        }
+
+        return pattern;
+    }
+
     public Pattern convertPattern(final String regex) {
         String start = "";
         String end = "";
