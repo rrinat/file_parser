@@ -8,8 +8,6 @@ import java.io.File;
 
 public class FileProvider {
 
-    private static final String DIRECTORY_NAME = "results";
-
     private final Context context;
 
     public static FileProvider getInstance() {
@@ -27,7 +25,7 @@ public class FileProvider {
 
     public File getPrivateExternalDirectory() {
         if (isExternalStorageWritable()) {
-            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), DIRECTORY_NAME);
+            File file = new File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "");
             if (file.exists() || file.mkdir()) {
                 return file;
             }

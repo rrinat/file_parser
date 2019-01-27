@@ -12,11 +12,11 @@ public class StringParseTest {
 
     private Charset characterSet = Charset.forName("US-ASCII");
 
-    private byte[] array_0 = "\n".getBytes(characterSet);
-    private byte[] array_1 = "some\nabc\nas3feSo3me\na4ttrree".getBytes(characterSet);
-    private byte[] array_2 = "2\n3934590 some\nsdfsdf aaaabbbccc\n".getBytes(characterSet);
-    private byte[] array_3 = "2\n3somedf3dff\n3sdsdgSo4me".getBytes(characterSet);
-    private byte[] array_4 = "asf abc dfdf\ndfevd dfdf\n04fgf kfsdklgsdklgskl".getBytes(characterSet);
+    private byte[] array_0 = "\r\n".getBytes(characterSet);
+    private byte[] array_1 = "some\r\nabc\r\nas3feSo3me\r\na4ttrree".getBytes(characterSet);
+    private byte[] array_2 = "2\r\n3934590 some\r\nsdfsdf aaaabbbccc\r\n".getBytes(characterSet);
+    private byte[] array_3 = "2\r\n3somedf3dff\r\n3sdsdgSo4me".getBytes(characterSet);
+    private byte[] array_4 = "asf abc dfdf\r\ndfevd dfdf\r\n04fgf kfsdklgsdklgskl".getBytes(characterSet);
     private byte[] array_5 = "\naana w 34  erwerwer".getBytes(characterSet);
     private int lastIndex = 5;
 

@@ -6,6 +6,7 @@ import java.util.List;
 import static com.rrinat.fileparser.Consts.REG_EXPR_SYMBOLS_ANY;
 import static com.rrinat.fileparser.Consts.REG_EXPR_SYMBOL_LINE_END;
 import static com.rrinat.fileparser.Consts.REX_EXPR_SYMBOL_ANY_ONE;
+import static com.rrinat.fileparser.Consts.SYMBOL_LINE_CARRIAGE_RETURN;
 import static com.rrinat.fileparser.Consts.SYMBOL_LINE_END;
 
 class StringParser {
@@ -71,7 +72,7 @@ class StringParser {
                 if (isAchievedLineEnd()) {
                     addNewLine();
                     resetLineParsing();
-                    incrementCurrentSymbol();
+                    skipUntilNotLineEndSymbols();
                     break;
                 } else {
                     appendSymbol();
@@ -86,7 +87,7 @@ class StringParser {
 
         if (isAchievedLineEnd()) {
             resetLineParsing();
-            incrementCurrentSymbol();
+            skipUntilNotLineEndSymbols();
         } else {
             appendSymbol();
             incrementCurrentSymbol();
@@ -98,7 +99,7 @@ class StringParser {
 
         if (isAchievedLineEnd()) {
             resetLineParsing();
-            incrementCurrentSymbol();
+            skipUntilNotLineEndSymbols();
         } else {
             if (isPrevAnyRegExprSymbols()) {
                 appendByExactSymbol();
@@ -118,7 +119,7 @@ class StringParser {
         while (!isAchievedDataEnd()) {
             if (isAchievedLineEnd()) {
                 resetLineParsing();
-                incrementCurrentSymbol();
+                skipUntilNotLineEndSymbols();
                 break;
             }
 
@@ -137,7 +138,7 @@ class StringParser {
         if (isAchievedLineEnd()) {
             addNewLine();
             resetLineParsing();
-            incrementCurrentSymbol();
+            skipUntilNotLineEndSymbols();
         } else {
             isAcceptableLine = false;
             loopUntilLineEnd();
@@ -168,6 +169,12 @@ class StringParser {
         currentSymbolIndex += 1;
     }
 
+    private void skipUntilNotLineEndSymbols() {
+        while (currentSymbolIndex < dataLength && isAchievedLineEnd()) {
+            incrementCurrentSymbol();
+        }
+    }
+
     private boolean isAchievedDataEnd() {
         if (currentSymbolIndex == dataLength) {
             regExprIndex -= 1;
@@ -181,14 +188,14 @@ class StringParser {
     }
 
     private boolean isAchievedLineEnd() {
-        return data[currentSymbolIndex] == SYMBOL_LINE_END;
+        return data[currentSymbolIndex] == SYMBOL_LINE_END || data[currentSymbolIndex] == SYMBOL_LINE_CARRIAGE_RETURN;
     }
 
     private void loopUntilLineEnd() {
         while (!isAchievedDataEnd()) {
             if (isAchievedLineEnd()) {
                 resetLineParsing();
-                incrementCurrentSymbol();
+                skipUntilNotLineEndSymbols();
                 break;
             }
             incrementCurrentSymbol();

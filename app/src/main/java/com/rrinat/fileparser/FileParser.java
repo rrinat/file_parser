@@ -1,13 +1,13 @@
 package com.rrinat.fileparser;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.regex.Pattern;
+import java.util.List;
 
 public class FileParser {
 
@@ -18,21 +18,22 @@ public class FileParser {
     }
 
     private final static String OUTPUT_FILE_NAME = "results.log";
+    private final static int BUFFER_SIZE = 1024 * 1024;
 
     private final FileProvider fileProvider = FileProvider.getInstance();
+    private final StringParser stringParser;
     private final String inputFilePath;
-    private final Pattern pattern;
     private final Listener listener;
 
-    private BufferedReader reader = null;
+    private BufferedInputStream reader = null;
     private BufferedWriter writer = null;
     private File inputFile;
     private File outputFile = null;
 
-    public FileParser(final Listener listener, final String inputFilePath, final Pattern pattern) {
+    public FileParser(final Listener listener, final String inputFilePath, final String pattern) {
         this.listener = listener;
         this.inputFilePath = inputFilePath;
-        this.pattern = pattern;
+        this.stringParser = new StringParser(pattern);
     }
 
     public boolean start() {
@@ -101,14 +102,18 @@ public class FileParser {
         return new Runnable() {
             @Override
             public void run() {
-                String line;
+                byte[] data = new byte[BUFFER_SIZE];
                 while (true) {
                     try {
-                        if ((line = reader.readLine()) == null) break;
-                        if (pattern.matcher(line).matches()) {
-                            writer.write(line);
-                            listener.onNext(line);
+                        int bytesRead;
+                        if ((bytesRead = reader.read(data)) == -1) {
+                            stringParser.addLastLine();
+                            writeLines(stringParser.getLines());
+                            break;
                         }
+                        stringParser.parse(data, bytesRead);
+                        writeLines(stringParser.getLines());
+                        stringParser.clearLines();
                     } catch (IOException e) {
                         e.printStackTrace();
                         closeReaderAndWriter();
@@ -127,9 +132,17 @@ public class FileParser {
         };
     }
 
+    private void writeLines(List<String> lines) throws IOException {
+        for (String line : lines) {
+            writer.write(line);
+            writer.newLine();
+            listener.onNext(line);
+        }
+    }
+
     private void initReaderAndWriter() {
         try {
-            reader = new BufferedReader(new FileReader(inputFile));
+            reader = new BufferedInputStream(new FileInputStream(inputFile));
             writer = new BufferedWriter(new FileWriter(outputFile));
         } catch (FileNotFoundException e) {
             e.printStackTrace();

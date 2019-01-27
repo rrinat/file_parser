@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/hint_file_path"
-            android:text="/storage/emulated/0/Download/big.txt"
+            android:text="/storage/emulated/0/Download/small.txt"
             android:inputType="textUri"/>
     </android.support.design.widget.TextInputLayout>
 

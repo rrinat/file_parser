@@ -61,7 +61,7 @@ public class ParserService extends Service implements FileParser.Listener {
 
         clearItems();
 
-        fileParser = new FileParser(this, inputFilePath, new RegExpConverter().convertPattern(regExp));
+        fileParser = new FileParser(this, inputFilePath, new RegExpConverter().normalize(regExp));
         if (fileParser.start()) {
             isParsing = true;
         }
