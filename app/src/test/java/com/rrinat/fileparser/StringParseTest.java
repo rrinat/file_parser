@@ -28,7 +28,7 @@ public class StringParseTest {
     @Test
     public void parse() {
         List<String> result = parse("$");
-        assertTrue(result.size() == 1 && result.get(0).equals(""));
+        assertTrue(result.size() == 1);
 
         result = parse("*");
         assertTrue(result.size() == 13);

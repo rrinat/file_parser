@@ -13,7 +13,7 @@ import static com.rrinat.fileparser.Consts.SYMBOL_LINE_END;
 
 class StringParser {
 
-    private Charset characterSet = Charset.forName("US-ASCII");
+    private final Charset characterSet = Charset.forName("US-ASCII");
 
     private final String regExpr;
 
@@ -23,15 +23,18 @@ class StringParser {
     private int regExprIndex = 0;
     private byte regChar;
 
-    private StringBuilder stringBuilder = new StringBuilder();
+    private int beginLine = -1;
     private List<String> lines = new ArrayList<>();
     private boolean isAcceptableLine = true;
+    private String prevLine = "";
 
     StringParser(String regExpr) {
         this.regExpr = regExpr;
     }
 
     public void parse(byte[] data, int dataLength) {
+        prevLine = copyLastLine();
+        beginLine = 0;
         currentSymbolIndex = 0;
         this.data = data;
         this.dataLength = dataLength;
@@ -157,17 +160,36 @@ class StringParser {
     }
 
     private void appendSymbol() {
-        stringBuilder.append((char)data[currentSymbolIndex]);
+        if (beginLine < 0) {
+            beginLine = currentSymbolIndex;
+        }
     }
 
     private void addNewLine() {
-        if (isAcceptableLine) {
-            lines.add(stringBuilder.toString());
+        if (isAcceptableLine && beginLine >= 0) {
+            lines.add(prevLine + copyLine());
+            prevLine = "";
+        }
+    }
+
+    private String copyLastLine() {
+        if (beginLine > 0) {
+            return copyLine();
+        } else {
+            return "";
+        }
+    }
+
+    private String copyLine() {
+        if (beginLine == currentSymbolIndex) {
+            return "";
+        } else {
+            return new String(Arrays.copyOfRange(data, beginLine, currentSymbolIndex), characterSet);
         }
     }
 
     private void resetLineParsing() {
-        stringBuilder.setLength(0);
+        beginLine = -1;
         regExprIndex = -1;
         isAcceptableLine = true;
     }
