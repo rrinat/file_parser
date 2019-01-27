@@ -1,6 +1,8 @@
 package com.rrinat.fileparser;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.rrinat.fileparser.Consts.REG_EXPR_SYMBOLS_ANY;
@@ -11,12 +13,15 @@ import static com.rrinat.fileparser.Consts.SYMBOL_LINE_END;
 
 class StringParser {
 
+    private Charset characterSet = Charset.forName("US-ASCII");
+
     private final String regExpr;
 
     private int currentSymbolIndex = 0;
     private byte[] data;
     private int dataLength = 0;
     private int regExprIndex = 0;
+    private byte regChar;
 
     private StringBuilder stringBuilder = new StringBuilder();
     private List<String> lines = new ArrayList<>();
@@ -51,7 +56,8 @@ class StringParser {
 
     private void loopRegExpr() {
         while (regExprIndex < regExpr.length() && currentSymbolIndex < dataLength) {
-            switch (regExpr.charAt(regExprIndex)) {
+            regChar = (byte)regExpr.charAt(regExprIndex);
+            switch (regChar) {
                 case REG_EXPR_SYMBOLS_ANY:
                     acceptAnySymbol();
                     break;
@@ -77,7 +83,7 @@ class StringParser {
                     break;
                 } else {
                     appendSymbol();
-                    incrementCurrentSymbol();
+                    currentSymbolIndex += 1;
                 }
             }
         }
@@ -91,7 +97,7 @@ class StringParser {
             skipUntilNotLineEndSymbols();
         } else {
             appendSymbol();
-            incrementCurrentSymbol();
+            currentSymbolIndex += 1;
         }
     }
 
@@ -107,10 +113,10 @@ class StringParser {
             } else {
                 if (isEqualExactSymbol()) {
                     appendSymbol();
-                    incrementCurrentSymbol();
+                    currentSymbolIndex += 1;
                 } else {
+                    currentSymbolIndex += 1;
                     resetLineParsing();
-                    incrementCurrentSymbol();
                 }
             }
         }
@@ -126,10 +132,10 @@ class StringParser {
 
             appendSymbol();
             if (isEqualExactSymbol()) {
-                incrementCurrentSymbol();
+                currentSymbolIndex += 1;
                 break;
             }
-            incrementCurrentSymbol();
+            currentSymbolIndex += 1;
         }
     }
 
@@ -166,13 +172,9 @@ class StringParser {
         isAcceptableLine = true;
     }
 
-    private void incrementCurrentSymbol() {
-        currentSymbolIndex += 1;
-    }
-
     private void skipUntilNotLineEndSymbols() {
         while (currentSymbolIndex < dataLength && isAchievedLineEnd()) {
-            incrementCurrentSymbol();
+            currentSymbolIndex += 1;
         }
     }
 
@@ -185,11 +187,12 @@ class StringParser {
     }
 
     private boolean isEqualExactSymbol() {
-        return data[currentSymbolIndex] == regExpr.charAt(regExprIndex);
+        return data[currentSymbolIndex] == regChar;
     }
 
     private boolean isAchievedLineEnd() {
-        return data[currentSymbolIndex] == SYMBOL_LINE_END || data[currentSymbolIndex] == SYMBOL_LINE_CARRIAGE_RETURN;
+        byte symbol = data[currentSymbolIndex];
+        return symbol == SYMBOL_LINE_END || symbol == SYMBOL_LINE_CARRIAGE_RETURN;
     }
 
     private void loopUntilLineEnd() {
@@ -199,7 +202,7 @@ class StringParser {
                 skipUntilNotLineEndSymbols();
                 break;
             }
-            incrementCurrentSymbol();
+            currentSymbolIndex += 1;
         }
     }
 
