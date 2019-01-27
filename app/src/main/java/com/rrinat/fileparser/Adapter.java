@@ -42,6 +42,7 @@ class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     }
 
     void onClearLines() {
+        selectedItems.clear();
         notifyDataSetChanged();
     }
 

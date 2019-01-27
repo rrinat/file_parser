@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
     private EditText regExpEditText;
 
     private Button startButton;
+    private View progressView;
 
     private Adapter adapter = new Adapter();
 
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
         regExpEditText = findViewById(R.id.rexexp_edit_text);
 
         startButton = findViewById(R.id.start_button);
+        progressView = findViewById(R.id.progress);
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -133,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
     private void startParser() {
         if (bound) {
             parserService.tryToStart(filePathEditText.getText().toString(), regExpEditText.getText().toString());
-            hideStartButton();
+            showProgress();
         }
     }
 
@@ -154,10 +156,12 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
 
     private void showStartButton() {
         startButton.setVisibility(View.VISIBLE);
+        progressView.setVisibility(View.GONE);
     }
 
-    private void hideStartButton() {
+    private void showProgress() {
         startButton.setVisibility(View.GONE);
+        progressView.setVisibility(View.VISIBLE);
     }
 
     private ServiceConnection connection = new ServiceConnection() {
@@ -182,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
         adapter.setItems(parserService.getItems());
 
         if (parserService.isParsing()) {
-            hideStartButton();
+            showProgress();
         } else {
             showStartButton();
         }
