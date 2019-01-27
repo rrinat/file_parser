@@ -17,6 +17,7 @@ class StringParser {
     private byte[] data;
     private int dataLength = 0;
     private int regExprIndex = 0;
+
     private StringBuilder stringBuilder = new StringBuilder();
     private List<String> lines = new ArrayList<>();
     private boolean isAcceptableLine = true;

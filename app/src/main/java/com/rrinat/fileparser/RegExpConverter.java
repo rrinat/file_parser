@@ -1,9 +1,9 @@
 package com.rrinat.fileparser;
 
 
-public class RegExpConverter {
+class RegExpConverter {
 
-    public String normalize(final String regexp) {
+    String normalize(final String regexp) {
         final String anySymbols = "" + Consts.REG_EXPR_SYMBOLS_ANY;
 
         String pattern = regexp.replaceAll("\\*{2,}", anySymbols);

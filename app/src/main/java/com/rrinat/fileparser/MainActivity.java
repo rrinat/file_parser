@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
     private void startParser() {
         if (bound) {
             parserService.tryToStart(filePathEditText.getText().toString(), regExpEditText.getText().toString());
-            showProgress();
+            updateStartButtonVisibility();
         }
     }
 
@@ -184,7 +184,10 @@ public class MainActivity extends AppCompatActivity implements ParserService.Lis
     private void onBindService() {
         parserService.setListener(MainActivity.this);
         adapter.setItems(parserService.getItems());
+        updateStartButtonVisibility();
+    }
 
+    private void updateStartButtonVisibility() {
         if (parserService.isParsing()) {
             showProgress();
         } else {

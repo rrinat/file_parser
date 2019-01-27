@@ -14,8 +14,8 @@ import java.util.List;
 
 class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
+    private final BitSet selectedItems = new BitSet();
     private List<String> items = Collections.emptyList();
-    private BitSet selectedItems = new BitSet();
 
     @NonNull
     @Override
@@ -56,7 +56,7 @@ class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         for (int i = selectedItems.nextSetBit(0); i >= 0; i = selectedItems.nextSetBit(i+1)) {
             if (i == Integer.MAX_VALUE) {
-                break; // or (i+1) would overflow
+                break;
             }
 
             if (i < getItemCount()) {

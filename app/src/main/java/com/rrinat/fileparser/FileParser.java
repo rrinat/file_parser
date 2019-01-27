@@ -99,35 +99,32 @@ public class FileParser {
     }
 
     private Runnable createParsingRunnable() {
-        return new Runnable() {
-            @Override
-            public void run() {
-                byte[] data = new byte[BUFFER_SIZE];
-                while (true) {
-                    try {
-                        int bytesRead;
-                        if ((bytesRead = reader.read(data)) == -1) {
-                            stringParser.addLastLine();
-                            writeLines(stringParser.getLines());
-                            break;
-                        }
-                        stringParser.parse(data, bytesRead);
+        return () -> {
+            byte[] data = new byte[BUFFER_SIZE];
+            while (true) {
+                try {
+                    int bytesRead;
+                    if ((bytesRead = reader.read(data)) == -1) {
+                        stringParser.addLastLine();
                         writeLines(stringParser.getLines());
-                        stringParser.clearLines();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        closeReaderAndWriter();
-                        listener.onError();
-                        return;
+                        break;
                     }
-
-                }
-                closeReader();
-                if (closeWriter()) {
-                    listener.onComplete();
-                } else {
+                    stringParser.parse(data, bytesRead);
+                    writeLines(stringParser.getLines());
+                    stringParser.clearLines();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    closeReaderAndWriter();
                     listener.onError();
+                    return;
                 }
+
+            }
+            closeReader();
+            if (closeWriter()) {
+                listener.onComplete();
+            } else {
+                listener.onError();
             }
         };
     }
