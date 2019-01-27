@@ -50,6 +50,9 @@ public class StringParseTest {
 
         result = parse("*So?me$");
         assertTrue(result.size() == 1);
+
+        result = parse("some$");
+        assertTrue(result.size() == 1);
     }
 
     private List<String> parse(String pattern) {
@@ -59,7 +62,7 @@ public class StringParseTest {
         stringParser.parse(array_2, array_2.length);
         stringParser.parse(array_3, array_3.length);
         stringParser.parse(array_4, array_4.length);
-        stringParser.parse(array_5, array_5.length);
+        stringParser.parse(array_5, lastIndex);
 
         stringParser.addLastLine();
 

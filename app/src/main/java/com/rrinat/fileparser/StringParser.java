@@ -13,20 +13,21 @@ import static com.rrinat.fileparser.Consts.SYMBOL_LINE_END;
 
 class StringParser {
 
-    private final Charset characterSet = Charset.forName("US-ASCII");
-
-    private final String regExpr;
+    private static final Charset CHARSET_ASCII = Charset.forName("US-ASCII");
 
     private int currentSymbolIndex = 0;
     private byte[] data;
     private int dataLength = 0;
+
+    private final String regExpr;
     private int regExprIndex = 0;
     private byte regChar;
 
     private int beginLine = -1;
     private List<String> lines = new ArrayList<>();
-    private boolean isAcceptableLine = true;
     private String prevLine = "";
+
+    private boolean needSkipLine = false;
 
     StringParser(String regExpr) {
         this.regExpr = regExpr;
@@ -38,7 +39,8 @@ class StringParser {
         currentSymbolIndex = 0;
         this.data = data;
         this.dataLength = dataLength;
-        
+
+        skipLineIfNeed();
         loopRegExpr();
     }
 
@@ -51,8 +53,9 @@ class StringParser {
     }
 
     public void addLastLine() {
-        if (regExpr.charAt(regExprIndex) == REG_EXPR_SYMBOL_LINE_END
-                || regExpr.charAt(regExprIndex) == REG_EXPR_SYMBOLS_ANY) {
+        if (regExprIndex < regExpr.length() &&
+                (regExpr.charAt(regExprIndex) == REG_EXPR_SYMBOL_LINE_END
+                        || regExpr.charAt(regExprIndex) == REG_EXPR_SYMBOLS_ANY)) {
             addNewLine();
         }
     }
@@ -79,7 +82,7 @@ class StringParser {
     private void acceptAnySymbol() {
         if (isAchieveRegExprEnd()) {
             while (!isAchievedDataEnd()) {
-                if (isAchievedLineEnd()) {
+                if (isLineEndSymbol()) {
                     addNewLine();
                     resetLineParsing();
                     skipUntilNotLineEndSymbols();
@@ -95,7 +98,7 @@ class StringParser {
     private void acceptAnyOneSymbol() {
         if (isAchievedDataEnd()) return;
 
-        if (isAchievedLineEnd()) {
+        if (isLineEndSymbol()) {
             resetLineParsing();
             skipUntilNotLineEndSymbols();
         } else {
@@ -107,34 +110,53 @@ class StringParser {
     private void acceptExactSymbol() {
         if (isAchievedDataEnd()) return;
 
-        if (isAchievedLineEnd()) {
+        if (isLineEndSymbol()) {
             resetLineParsing();
             skipUntilNotLineEndSymbols();
         } else {
             if (isPrevAnyRegExprSymbols()) {
                 appendByExactSymbol();
             } else {
-                if (isEqualExactSymbol()) {
+                if (equalExactSymbol()) {
                     appendSymbol();
                     currentSymbolIndex += 1;
                 } else {
-                    currentSymbolIndex += 1;
-                    resetLineParsing();
+                    skipLine();
                 }
             }
         }
     }
 
+    private void skipLineIfNeed() {
+        if (needSkipLine) {
+            skipLine();
+            regExprIndex = 0;
+        }
+    }
+
+    private void skipLine() {
+        while (currentSymbolIndex < dataLength) {
+            if (isLineEndSymbol()) {
+                resetLineParsing();
+                skipUntilNotLineEndSymbols();
+                needSkipLine = false;
+                return;
+            }
+            currentSymbolIndex += 1;
+        }
+        needSkipLine = true;
+    }
+
     private void appendByExactSymbol() {
         while (!isAchievedDataEnd()) {
-            if (isAchievedLineEnd()) {
+            if (isLineEndSymbol()) {
                 resetLineParsing();
                 skipUntilNotLineEndSymbols();
                 break;
             }
 
             appendSymbol();
-            if (isEqualExactSymbol()) {
+            if (equalExactSymbol()) {
                 currentSymbolIndex += 1;
                 break;
             }
@@ -145,13 +167,12 @@ class StringParser {
     private void acceptLineEndSymbol() {
         if (isAchievedDataEnd()) return;
 
-        if (isAchievedLineEnd()) {
+        if (isLineEndSymbol()) {
             addNewLine();
             resetLineParsing();
             skipUntilNotLineEndSymbols();
         } else {
-            isAcceptableLine = false;
-            loopUntilLineEnd();
+            skipLine();
         }
     }
 
@@ -166,14 +187,14 @@ class StringParser {
     }
 
     private void addNewLine() {
-        if (isAcceptableLine && beginLine >= 0) {
+        if (!needSkipLine && beginLine >= 0) {
             lines.add(prevLine + copyLine());
             prevLine = "";
         }
     }
 
     private String copyLastLine() {
-        if (beginLine > 0) {
+        if (beginLine >= 0 && !needSkipLine) {
             return copyLine();
         } else {
             return "";
@@ -184,18 +205,17 @@ class StringParser {
         if (beginLine == currentSymbolIndex) {
             return "";
         } else {
-            return new String(Arrays.copyOfRange(data, beginLine, currentSymbolIndex), characterSet);
+            return new String(Arrays.copyOfRange(data, beginLine, currentSymbolIndex), CHARSET_ASCII);
         }
     }
 
     private void resetLineParsing() {
         beginLine = -1;
         regExprIndex = -1;
-        isAcceptableLine = true;
     }
 
     private void skipUntilNotLineEndSymbols() {
-        while (currentSymbolIndex < dataLength && isAchievedLineEnd()) {
+        while (currentSymbolIndex < dataLength && isLineEndSymbol()) {
             currentSymbolIndex += 1;
         }
     }
@@ -208,24 +228,13 @@ class StringParser {
         return false;
     }
 
-    private boolean isEqualExactSymbol() {
+    private boolean equalExactSymbol() {
         return data[currentSymbolIndex] == regChar;
     }
 
-    private boolean isAchievedLineEnd() {
+    private boolean isLineEndSymbol() {
         byte symbol = data[currentSymbolIndex];
         return symbol == SYMBOL_LINE_END || symbol == SYMBOL_LINE_CARRIAGE_RETURN;
-    }
-
-    private void loopUntilLineEnd() {
-        while (!isAchievedDataEnd()) {
-            if (isAchievedLineEnd()) {
-                resetLineParsing();
-                skipUntilNotLineEndSymbols();
-                break;
-            }
-            currentSymbolIndex += 1;
-        }
     }
 
     private boolean isPrevAnyRegExprSymbols() {
