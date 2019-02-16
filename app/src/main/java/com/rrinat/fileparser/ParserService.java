@@ -108,4 +108,12 @@ public class ParserService extends Service implements FileParser.Listener {
             listener.onClearLines();
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (fileParser != null) {
+            fileParser.stop();
+        }
+    }
 }

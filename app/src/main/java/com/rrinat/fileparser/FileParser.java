@@ -1,5 +1,6 @@
 package com.rrinat.fileparser;
 
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,6 +30,7 @@ public class FileParser {
     private BufferedWriter writer = null;
     private File inputFile;
     private File outputFile = null;
+    private Thread thread;
 
     public FileParser(final Listener listener, final String inputFilePath, final String pattern) {
         this.listener = listener;
@@ -42,6 +44,12 @@ public class FileParser {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public void stop() {
+        if (thread != null && thread.isAlive()) {
+            thread.interrupt();
         }
     }
 
@@ -95,38 +103,49 @@ public class FileParser {
     }
 
     private void parsing() {
-        new Thread(createParsingRunnable()).start();
+        thread = new Thread(createParsingRunnable());
+        thread.start();
     }
 
     private Runnable createParsingRunnable() {
         return () -> {
-            byte[] data = new byte[BUFFER_SIZE];
-            while (true) {
-                try {
-                    int bytesRead;
-                    if ((bytesRead = reader.read(data)) == -1) {
-                        stringParser.addLastLine();
-                        writeLines(stringParser.getLines());
-                        break;
-                    }
-                    stringParser.parse(data, bytesRead);
-                    writeLines(stringParser.getLines());
-                    stringParser.clearLines();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    closeReaderAndWriter();
-                    listener.onError();
-                    return;
-                }
-
-            }
-            closeReader();
-            if (closeWriter()) {
-                listener.onComplete();
-            } else {
+            try {
+                dispatchFile();
+            } catch (InterruptedException e) {
+                closeReaderAndWriter();
                 listener.onError();
+                Thread.currentThread().interrupt();
             }
         };
+    }
+
+    private void dispatchFile() throws InterruptedException {
+        byte[] data = new byte[BUFFER_SIZE];
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                int bytesRead;
+                if ((bytesRead = reader.read(data)) == -1) {
+                    stringParser.addLastLine();
+                    writeLines(stringParser.getLines());
+                    break;
+                }
+                stringParser.parse(data, bytesRead);
+                writeLines(stringParser.getLines());
+                stringParser.clearLines();
+            } catch (IOException e) {
+                e.printStackTrace();
+                closeReaderAndWriter();
+                listener.onError();
+                return;
+            }
+
+        }
+        closeReader();
+        if (closeWriter()) {
+            listener.onComplete();
+        } else {
+            listener.onError();
+        }
     }
 
     private void writeLines(List<String> lines) throws IOException {
